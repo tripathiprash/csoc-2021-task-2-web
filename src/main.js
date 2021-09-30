@@ -22,9 +22,9 @@ function displayInfoToast(message) {
 
 const API_BASE_URL = 'https://todo-app-csoc.herokuapp.com/';
 
-const reg_B= document.getElementById('register')
-const lgin_B= document.getElementById('login')
-const addtask_B= document.getElementById('addTask')
+const reg_B= document.getElementById('register_btn')
+const lgin_B= document.getElementById('loginbtn')
+const addtask_B= document.getElementById('addtaskbtn')
 const lgout_B= document.getElementById('logout')
 
 if(reg_B){
