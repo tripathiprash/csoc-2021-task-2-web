@@ -155,38 +155,38 @@ function addTask() {
     document.getElementById('form-control').value=''
 }
 
- export function fresh_data_entry (newdata){
+ export function fresh_entry_data (newnode){
     let list= document.createElement('li')
     list.className = 'list-group-item d-flex justify-content-between align-items-center'
     list.innerHTML = 
-    `<input id="input-button-${newdata.id}" type="text" class="form-control todo-edit-task-input hideme" placeholder="Edit The Task">
-    <div id="done-button-${newdata.id}"  class="input-group-append hideme">
+    `<input id="input-button-${newnode.id}" type="text" class="form-control todo-edit-task-input hideme" placeholder="Edit The Task">
+    <div id="done-button-${newnode.id}"  class="input-group-append hideme">
         <button class="btn btn-outline-secondary todo-update-task" type="button" id="updateTask(${newdata.id})">Done</button>
     </div>
-    <div id="task-${newdata.id}" class="todo-task">
-        ${newdata.title}
+    <div id="task-${newnode.id}" class="todo-task">
+        ${newnode.title}
     </div>
-    <span id="task-actions-${newdata.id}">
-        <button style="margin-right:5px;" type="button" id="editTask(${newdata.id})"
+    <span id="task-actions-${newnode.id}">
+        <button style="margin-right:5px;" type="button" id="editTask(${newnode.id})"
             class="btn btn-outline-warning">
             <img src="https://res.cloudinary.com/nishantwrp/image/upload/v1587486663/CSOC/edit.png"
                 width="18px" height="20px">
         </button>
-        <button type="button" class="btn btn-outline-danger" id="deleteTask(${newdata.id})">
+        <button type="button" class="btn btn-outline-danger" id="deleteTask(${newnode.id})">
             <img src="https://res.cloudinary.com/nishantwrp/image/upload/v1587486661/CSOC/delete.svg"
                 width="18px" height="22px">
         </button>
     </span>`
-    list.id = 'list-'+newdata.id
+    list.id = 'list-'+newnode.id
     document.getElementById('completeList').appendChild(list)
-    document.getElementById('deleteTask('+newdata.id+')').addEventListener('click',function(){
-        deleteTask(newdata.id)
+    document.getElementById('deleteTask('+newnode.id+')').addEventListener('click',function(){
+        deleteTask(newnode.id)
     })
-    document.getElementById('editTask('+newdata.id+')').addEventListener('click',function(){
-        editTask(newdata.id)
+    document.getElementById('editTask('+newnode.id+')').addEventListener('click',function(){
+        editTask(newnode.id)
     })
-    document.getElementById('updateTask('+newdata.id+')').addEventListener('click',function(){
-        updateTask(newdata.id)
+    document.getElementById('updateTask('+newnode.id+')').addEventListener('click',function(){
+        updateTask(newnode.id)
     })
 }
 
@@ -203,6 +203,22 @@ function deleteTask(id) {
      * @todo 1. Send the request to delete the task to the backend server.
      * @todo 2. Remove the task from the dom.
      */
+    axios({
+        headers: {
+            Authorization: "Token " + localStorage.getItem("token")
+        },
+        url: API_BASE_URL + "todo/" + id + "/",
+        method: "delete"
+    })
+        .then(function ({ data }) {
+            document.querySelector(`#todo-${id}`).remove();
+            displaySuccessToast("Task deleted succeessfully.")
+        })
+        .catch(function (err) {
+            console.log(err)
+            displayErrorToast("ERROR! Deletion unsuccessful.");
+        });
+    
 }
 
 function updateTask(id) {
@@ -211,4 +227,27 @@ function updateTask(id) {
      * @todo 1. Send the request to update the task to the backend server.
      * @todo 2. Update the task in the dom.
      */
+    const update_text = document.getElementById("input-button-" + id).value;
+     if (!update_text) {
+         return;
+     }
+     axios({
+         headers: {
+             Authorization: "Token " + localStorage.getItem("token")
+         },
+         url: API_BASE_URL + "todo/" + id + "/",
+         method: "patch",
+         data: { title: update_text }
+     })
+         .then(function ({ data, status }) {
+            document.getElementById("task-" + id).innerText = update_text;
+             document.getElementById("task-" + id).classList.remove("hideme");
+             document.getElementById("task-actions-" + id).classList.remove("hideme");
+             document.getElementById("input-button-" + id).classList.add("hideme");
+             document.getElementById("done-button-" + id).classList.add("hideme");
+             displaySuccessToast("Task updated successfully.")
+         })
+         .catch(function (err) {
+             displayErrorToast("ERROR! Updation unsuccessful.");
+         });
 }
