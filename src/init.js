@@ -17,9 +17,9 @@ function getTasks() {
         method: "get"
     }).then(function (response) {
         const { data, status } = response;
-        for (let use of data) {
-            const usetask = use.id;
-            const usetext = use.title;
+        for (let task of data) {
+            const usetask = task.id;
+            const usetext = task.title;
             fresh_entry_data(usetext, usetask);  
         }
     }).catch(function (err) {
